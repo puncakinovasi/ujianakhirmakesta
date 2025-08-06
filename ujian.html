@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Pengkaderan MAKESTA</title>
+    <style>
+        /* == KODE CSS == */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #00564d;
+            border-bottom: 2px solid #00806c;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-left: 15px;
+            border-left: 3px solid #e0e0e0;
+        }
+        .question-block p {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .options input {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #00806c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #00564d;
+        }
+        #spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #00806c;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #result-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+         .result-section, .kunci-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .kunci-jawaban {
+            background-color: #fffbe6;
+            border-left: 5px solid #ffc107;
+        }
+        .correct { background-color: #e8f5e9; } /* Hijau untuk jawaban benar */
+        .incorrect { background-color: #ffebee; } /* Merah untuk jawaban salah */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Formulir Ujian Pengkaderan MAKESTA</h1>
+        
+        <form id="ujianForm">
+            <h2>Data Diri Peserta</h2>
+            <div class="form-group">
+                <label for="nama_lengkap">Nama Lengkap</label>
+                <input type="text" id="nama_lengkap" name="nama_lengkap" required>
+            </div>
+            <div class="form-group">
+                <label for="tanggal_lahir">Tanggal Lahir</label>
+                <input type="date" id="tanggal_lahir" name="tanggal_lahir" required>
+            </div>
+            <div class="form-group">
+                <label for="alamat">Alamat</label>
+                <textarea id="alamat" name="alamat" rows="3" required></textarea>
+            </div>
+
+            <!-- Bagian Soal akan dimasukkan di sini oleh JavaScript -->
+            <div id="soal-container"></div>
+
+            <button type="submit" id="submitBtn">Kirim Jawaban</button>
+            <div id="spinner"></div>
+        </form>
+
+        <div id="result-container">
+             <h2>Hasil Ujian Anda</h2>
+             <div id="skor-detail"></div>
+             <h2>Kunci Jawaban</h2>
+             <p>Lihat perbandingan jawaban Anda dengan kunci jawaban di bawah.</p>
+             <div id="kunci-jawaban-detail"></div>
+        </div>
+    </div>
+
+<script>
+// == KODE JAVASCRIPT ==
+document.addEventListener('DOMContentLoaded', function() {
+    const soal = {
+        "Ke-IPNU-an": [
+            { name: "ipnu_1", q: "1. IPNU merupakan singkatan dari...", o: ["A. Ikatan Pelajar Nasional Umum", "B. Ikatan Pelajar Nahdlatul Ulama", "C. Ikatan Pemuda NU", "D. Ikatan Pelajar Nusantara"], a: "B" },
+            { name: "ipnu_2", q: "2. IPNU didirikan pada tahun...", o: ["A. 1926", "B. 1945", "C. 1954", "D. 1965"], a: "C" },
+            { name: "ipnu_3", q: "3. Pendiri IPNU adalah...", o: ["A. KH. Hasyim Asy’ari", "B. KH. Wachid Hasyim", "C. KH. Mahfudz Siddiq", "D. KH. Tolchah Mansoer"], a: "D" },
+            { name: "ipnu_4", q: "4. Tujuan utama IPNU adalah...", o: ["A. Menjadi organisasi politik", "B. Menjadi wadah pelajar internasional", "C. Membina pelajar agar berakhlakul karimah", "D. Mengembangkan bisnis pelajar"], a: "C" },
+            { name: "ipnu_5", q: "5. IPNU bersifat...", o: ["A. Elitis", "B. Terbuka untuk umum", "C. Terbuka hanya untuk mahasiswa", "D. Terbuka untuk pelajar dan santri"], a: "D" },
+            { name: "ipnu_6", q: "6. Lambang IPNU berbentuk...", o: ["A. Bulat", "B. Segitiga", "C. Bintang", "D. Kotak"], a: "B" },
+            { name: "ipnu_7", q: "7. Warna hijau pada lambang IPNU melambangkan...", o: ["A. Keberanian", "B. Kemerdekaan", "C. Kesucian", "D. Keislaman"], a: "D" },
+            { name: "ipnu_8", q: "8. IPNU memiliki semboyan...", o: ["A. Belajar dan Berjuang", "B. Berani dan Berkarya", "C. Santun dan Sopan", "D. Dakwah dan Damai"], a: "A" },
+            { name: "ipnu_9", q: "9. IPNU menjunjung tinggi nilai...", o: ["A. Materialisme", "B. Kedisiplinan militer", "C. Aswaja", "D. Kapitalisme"], a: "C" },
+            { name: "ipnu_10", q: "10. Salah satu program kaderisasi IPNU adalah...", o: ["A. Lakut", "B. Kongres", "C. MAKESTA", "D. PKPT"], a: "C" },
+        ],
+        "Aswaja": [
+            { name: "aswaja_1", q: "1. Aswaja adalah kepanjangan dari...", o: ["A. Asosiasi Warga Jaya", "B. Ahlus Sunnah Wal Jama’ah", "C. Aswaja Warga NU", "D. Asal Warga Jamaah"], a: "B" },
+            { name: "aswaja_2", q: "2. Tiga dasar pokok Aswaja adalah...", o: ["A. Fikih, akidah, sejarah", "B. Tawassuth, Tasamuh, Ta’awun", "C. Ulama, pesantren, kitab", "D. Amar, Nahi, Iman"], a: "B" },
+            { name: "aswaja_3", q: "3. Sikap moderat dalam Aswaja disebut...", o: ["A. Tasamuh", "B. Tawassuth", "C. Tatharruf", "D. Ta’addud"], a: "B" },
+            { name: "aswaja_4", q: "4. Aswaja dalam akidah mengikuti...", o: ["A. Ibnu Taimiyah", "B. Imam Syafi’i", "C. Imam Abu Hasan al-Asy’ari dan Imam Maturidi", "D. Imam Al-Ghazali"], a: "C" },
+            { name: "aswaja_5", q: "5. Dalam fikih, Aswaja bermazhab pada...", o: ["A. Mazhab Wahabi", "B. Mazhab empat (Syafi’i, Maliki, Hanafi, Hanbali)", "C. Mazhab liberal", "D. Mazhab Zaidiyah"], a: "B" },
+            { name: "aswaja_6", q: "6. Aswaja menolak paham...", o: ["A. Toleransi", "B. Radikalisme dan Ekstremisme", "C. Kebangsaan", "D. Nasionalisme"], a: "B" },
+            { name: "aswaja_7", q: "7. Dalam tasawuf, Aswaja mengikuti...", o: ["A. Imam Syafi’i", "B. Imam al-Ghazali dan Imam Junaid al-Baghdadi", "C. Imam Hanafi", "D. Ibnu Sina"], a: "B" },
+            { name: "aswaja_8", q: "8. Aswaja menganjurkan sikap terhadap perbedaan adalah...", o: ["A. Intoleran", "B. Netral", "C. Permusuhan", "D. Tasamuh"], a: "D" },
+            { name: "aswaja_9", q: "9. Salah satu prinsip Aswaja adalah...", o: ["A. Fanatik kelompok", "B. Mengedepankan kekerasan", "C. Tawasuth dan I’tidal", "D. Menutup diri"], a: "C" },
+            { name: "aswaja_10", q: "10. Aswaja sebagai manhajul fikr artinya...", o: ["A. Jalan hidup", "B. Pola pikir", "C. Peraturan", "D. Sumber hukum"], a: "B" },
+        ],
+        "Ke-NU-an": [
+            { name: "nu_1", q: "1. Nahdlatul Ulama berdiri pada tahun...", o: ["A. 1908", "B. 1926", "C. 1945", "D. 1955"], a: "B" },
+            { name: "nu_2", q: "2. Pendiri utama NU adalah...", o: ["A. KH. Wahid Hasyim", "B. KH. Hasyim Asy’ari", "C. KH. Ahmad Dahlan", "D. KH. Mustofa Bisri"], a: "B" },
+            { name: "nu_3", q: "3. NU berhaluan...", o: ["A. Syiah", "B. Salafi", "C. Ahlussunnah wal Jama’ah", "D. Liberal"], a: "C" },
+            { name: "nu_4", q: "4. Lembaga Syuriah dalam NU berperan sebagai...", o: ["A. Pelaksana harian", "B. Pendidikan", "C. Kepengurusan wanita", "D. Pengendali kebijakan"], a: "D" },
+            { name: "nu_5", q: "5. Salah satu tujuan NU adalah...", o: ["A. Mendirikan negara Islam", "B. Menguasai politik", "C. Menegakkan ajaran Aswaja", "D. Menyeragamkan mazhab"], a: "C" },
+            { name: "nu_6", q: "6. NU mendirikan organisasi IPNU pada tahun...", o: ["A. 1926", "B. 1945", "C. 1954", "D. 1970"], a: "C" },
+            { name: "nu_7", q: "7. Sikap NU terhadap NKRI adalah...", o: ["A. Menolak", "B. Netral", "C. Menerima dengan syarat", "D. Menerima sebagai bentuk final"], a: "D" },
+            { name: "nu_8", q: "8. Madzhab fikih yang diikuti mayoritas warga NU adalah...", o: ["A. Hanafi", "B. Maliki", "C. Syafi’i", "D. Hanbali"], a: "C" },
+            { name: "nu_9", q: "9. Wawasan kebangsaan dalam NU termasuk dalam landasan...", o: ["A. Ekonomi", "B. Politik", "C. Bersikap", "D. Berpikir"], a: "C" },
+            { name: "nu_10", q: "10. Ciri khas NU adalah mengembangkan tradisi...", o: ["A. Liberal", "B. Modern", "C. Salafi", "D. Keagamaan lokal"], a: "D" },
+        ],
+        "Keindonesiaan": [
+            { name: "indonesia_1", q: "1. Semboyan bangsa Indonesia adalah...", o: ["A. Bhinneka Tunggal Ika", "B. NKRI Harga Mati", "C. Bersatu Kita Teguh", "D. Indonesia Jaya"], a: "A" },
+            { name: "indonesia_2", q: "2. Hari Kemerdekaan Indonesia adalah...", o: ["A. 17 Juli 1945", "B. 17 Agustus 1945", "C. 10 November 1945", "D. 1 Juni 1945"], a: "B" },
+            { name: "indonesia_3", q: "3. Pancasila sebagai dasar negara tercantum dalam...", o: ["A. UUD 1945", "B. Piagam Jakarta", "C. Pembukaan UUD 1945", "D. Perpres 1945"], a: "C" },
+            { name: "indonesia_4", q: "4. Salah satu tokoh NU yang berperan dalam kemerdekaan adalah...", o: ["A. KH. Ahmad Dahlan", "B. KH. Hasyim Asy’ari", "C. KH. Mas Mansur", "D. KH. Abdurrahman Wahid"], a: "B" },
+            { name: "indonesia_5", q: "5. Cinta tanah air menurut NU adalah bagian dari...", o: ["A. Sekularisme", "B. Wawasan global", "C. Iman", "D. Budaya lokal"], a: "C" },
+            { name: "indonesia_6", q: "6. NKRI bagi NU adalah...", o: ["A. Darul Harb", "B. Negara kafir", "C. Darus Salam", "D. Negara sah secara syar’i"], a: "D" },
+            { name: "indonesia_7", q: "7. Perjuangan kemerdekaan Indonesia tidak lepas dari peran...", o: ["A. Politisi", "B. Pelajar", "C. Ulama dan santri", "D. Wartawan"], a: "C" },
+            { name: "indonesia_8", q: "8. Makna ‘nasionalisme’ dalam pandangan NU adalah...", o: ["A. Fanatisme buta", "B. Cinta produk lokal", "C. Cinta dan bela tanah air", "D. Ideologi Barat"], a: "C" },
+            { name: "indonesia_9", q: "9. Sikap terhadap pluralitas bangsa menurut NU adalah...", o: ["A. Permusuhan", "B. Netral", "C. Penghormatan dan toleransi", "D. Penolakan"], a: "C" },
+            { name: "indonesia_10", q: "10. Wawasan kebangsaan harus ditanamkan sejak...", o: ["A. Dewasa", "B. Kaderisasi", "C. Sekolah menengah", "D. Masa kecil"], a: "B" },
+        ],
+        "Kepemimpinan": [
+            { name: "pemimpin_1", q: "1. Pemimpin dalam organisasi adalah...", o: ["A. Yang paling tua", "B. Yang kaya", "C. Yang punya jabatan", "D. Orang yang dipercaya dan mampu"], a: "D" },
+            { name: "pemimpin_2", q: "2. Syarat utama seorang pemimpin adalah...", o: ["A. Tampan dan kaya", "B. Populer", "C. Amanah dan adil", "D. Berpendidikan tinggi"], a: "C" },
+            { name: "pemimpin_3", q: "3. Contoh pemimpin ideal dalam Islam adalah...", o: ["A. Fir’aun", "B. Nabi Muhammad SAW", "C. Abu Lahab", "D. Qarun"], a: "B" },
+            { name: "pemimpin_4", q: "4. Pemimpin harus mampu mengambil keputusan secara...", o: ["A. Otoriter", "B. Sepihak", "C. Demokratis", "D. Cepat saja"], a: "C" },
+            { name: "pemimpin_5", q: "5. Kepemimpinan dalam organisasi IPNU harus bersifat...", o: ["A. Absolut", "B. Individual", "C. Kolektif kolegial", "D. Diktator"], a: "C" },
+            { name: "pemimpin_6", q: "6. Tujuan utama dari kepemimpinan adalah...", o: ["A. Mendominasi", "B. Mengatur", "C. Mengabdi dan melayani", "D. Menguasai"], a: "C" },
+            { name: "pemimpin_7", q: "7. Salah satu indikator keberhasilan pemimpin adalah...", o: ["A. Banyak lawan", "B. Kaya raya", "C. Bisa memimpin dengan bijak", "D. Berkuasa lama"], a: "C" },
+            { name: "pemimpin_8", q: "8. Prinsip kepemimpinan Rasulullah adalah...", o: ["A. Kekuasaan penuh", "B. Kekerasan", "C. Toleransi dan musyawarah", "D. Ambisi kekuasaan"], a: "C" },
+            { name: "pemimpin_9", q: "9. Pemimpin harus mampu menjadi...", o: ["A. Pemecah masalah", "B. Sumber konflik", "C. Penghibur", "D. Pemungut iuran"], a: "A" },
+            { name: "pemimpin_10", q: "10. Kepemimpinan dalam Islam bertujuan untuk...", o: ["A. Memerintah sesuka hati", "B. Menjadi penguasa dunia", "C. Menyampaikan amanah dengan benar", "D. Menjadi simbol"], a: "C" },
+        ],
+        "Keorganisasian": [
+            { name: "organisasi_1", q: "1. Organisasi adalah...", o: ["A. Sekumpulan orang tanpa tujuan", "B. Tempat nongkrong", "C. Kumpulan orang yang punya tujuan bersama", "D. Kelompok sosial media"], a: "C" },
+            { name: "organisasi_2", q: "2. Tujuan organisasi adalah untuk...", o: ["A. Bersantai", "B. Mencari uang", "C. Mewujudkan tujuan bersama", "D. Menghindari tugas"], a: "C" },
+            { name: "organisasi_3", q: "3. Unsur organisasi terdiri dari...", o: ["A. Pemimpin, uang, kekuasaan", "B. Ketua, sekretaris, bendahara", "C. Orang, tujuan, struktur", "D. Gedung, kas, anggota"], a: "C" },
+            { name: "organisasi_4", q: "4. Organisasi dalam Islam dicontohkan oleh...", o: ["A. Nabi Musa", "B. Nabi Isa", "C. Rasulullah SAW dan para sahabat", "D. Para wali"], a: "C" },
+            { name: "organisasi_5", q: "5. Manfaat organisasi bagi pelajar adalah...", o: ["A. Hiburan", "B. Ajang pamer", "C. Belajar kepemimpinan", "D. Mengisi waktu luang"], a: "C" },
+            { name: "organisasi_6", q: "6. Dalam organisasi harus ada aturan yang disebut...", o: ["A. PR", "B. PD PRT", "C. Qonun", "D. Tata tertib harian"], a: "B" },
+            { name: "organisasi_7", q: "7. Fungsi utama struktur organisasi adalah untuk...", o: ["A. Pajangan", "B. Formalitas", "C. Pembagian tugas", "D. Hiasan"], a: "C" },
+            { name: "organisasi_8", q: "8. Organisasi IPNU termasuk dalam jenis organisasi...", o: ["A. Politik", "B. Bisnis", "C. Keagamaan dan kaderisasi", "D. Militer"], a: "C" },
+            { name: "organisasi_9", q: "9. Salah satu fungsi organisasi adalah...", o: ["A. Mengumpulkan uang", "B. Membuat kesepakatan ilegal", "C. Wadah aktualisasi diri", "D. Tempat bermain"], a: "C" },
+            { name: "organisasi_10", q: "10. Organisasi berjalan baik jika ada...", o: ["A. Konflik", "B. Pemaksaan", "C. Kepemimpinan dan kerjasama", "D. Uang banyak"], a: "C" },
+        ]
+    };
+
+    const soalContainer = document.getElementById('soal-container');
+    for (const kategori in soal) {
+        const section = document.createElement('div');
+        section.innerHTML = `<h2>${kategori.replace(/_/g, ' ')}</h2>`;
+        soal[kategori].forEach(item => {
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = `block-${item.name}`;
+
+            let optionsHTML = `<p>${item.q}</p><div class="options">`;
+            item.o.forEach(opt => {
+                const value = opt.substring(0, 1);
+                optionsHTML += `
+                    <label>
+                        <input type="radio" name="${item.name}" value="${value}" required>
+                        ${opt}
+                    </label>
+                `;
+            });
+            optionsHTML += `</div>`;
+            block.innerHTML = optionsHTML;
+            section.appendChild(block);
+        });
+        soalContainer.appendChild(section);
+    }
+
+    const form = document.getElementById('ujianForm');
+    const spinner = document.getElementById('spinner');
+    const submitBtn = document.getElementById('submitBtn');
+    const resultContainer = document.getElementById('result-container');
+    const skorDetail = document.getElementById('skor-detail');
+    const kunciJawabanDetail = document.getElementById('kunci-jawaban-detail');
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxhBNiTzrwTRKvJvCExwDjJ83KLNb5CakVW0FH6KATmGITQfawKvZ6ziGPRwhs5057e/exec'; // <-- GANTI DENGAN URL SCRIPT ANDA
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        spinner.style.display = 'block';
+        submitBtn.style.display = 'none';
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(res => {
+            if(res.status === "sukses"){
+                form.style.display = 'none';
+                resultContainer.style.display = 'block';
+                
+                // Tampilkan Skor
+                skorDetail.innerHTML = `
+                    <div class="result-section"><strong>Total Skor: ${res.totalSkor} / 60</strong></div>
+                    <div class="result-section">Skor Ke-IPNU-an: <strong>${res.skorIpnu} / 10</strong></div>
+                    <div class="result-section">Skor Aswaja: <strong>${res.skorAswaja} / 10</strong></div>
+                    <div class="result-section">Skor Ke-NU-an: <strong>${res.skorNu} / 10</strong></div>
+                    <div class="result-section">Skor Keindonesiaan: <strong>${res.skorIndonesia} / 10</strong></div>
+                    <div class="result-section">Skor Kepemimpinan: <strong>${res.skorPemimpin} / 10</strong></div>
+                    <div class="result-section">Skor Keorganisasian: <strong>${res.skorOrganisasi} / 10</strong></div>
+                `;
+
+                // Tampilkan Kunci Jawaban
+                kunciJawabanDetail.innerHTML = ''; // Kosongkan dulu
+                for (const kategori in soal) {
+                    const kunciSection = document.createElement('div');
+                    kunciSection.className = 'kunci-section';
+                    kunciSection.innerHTML = `<h3>${kategori}</h3>`;
+                    
+                    soal[kategori].forEach(item => {
+                        const jawabanPeserta = data[item.name];
+                        const kunciBenar = res.kunciJawaban[item.name];
+                        const isCorrect = jawabanPeserta === kunciBenar;
+                        
+                        const qDiv = document.createElement('div');
+                        qDiv.innerHTML = `<p>${item.q}</p>`;
+                        qDiv.innerHTML += `Jawaban Anda: <strong>${jawabanPeserta || 'Tidak dijawab'}</strong>. Kunci Jawaban: <strong>${kunciBenar}</strong>.`;
+                        qDiv.className = isCorrect ? 'correct' : 'incorrect';
+                        qDiv.style.padding = '10px';
+                        qDiv.style.margin = '5px 0';
+                        qDiv.style.borderRadius = '4px';
+
+                        kunciSection.appendChild(qDiv);
+                    });
+
+                    kunciJawabanDetail.appendChild(kunciSection);
+                }
+
+            } else {
+                alert('Terjadi kesalahan: ' + res.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error!', error.message);
+            alert('Gagal mengirim data. Periksa koneksi internet Anda.');
+        })
+        .finally(() => {
+            spinner.style.display = 'none';
+            // Jangan tampilkan tombol submit lagi agar tidak bisa submit ulang
+        });
+    });
+});
+</script>
+
+</body>
+</html>
